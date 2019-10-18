@@ -1,0 +1,97 @@
+---
+- name: Install lego package
+  xbps:
+    pkg: lego
+    state: present
+
+- name: Create {{ lego_group }} group
+  group:
+    name: "{{ lego_group }}"
+    state: present
+    system: yes
+
+- name: Create {{ lego_user }} user
+  user:
+    name: "{{ lego_user }}"
+    state: present
+    system: yes
+    createhome: yes
+    home: "{{ lego_homedir }}"
+
+- name: Create lego data directory
+  file:
+    path: "{{ lego_homedir }}"
+    state: directory
+    owner: "{{ lego_user }}"
+    group: "{{ lego_group }}"
+    mode: 0755
+
+- name: Create lego acme-challenge directory
+  file:
+    path: "{{ lego_webroot }}/.well-known/acme-challenge"
+    state: directory
+    owner: "{{ lego_user }}"
+    group: "{{ lego_group }}"
+    mode: 0755
+
+- name: Install lego firewall rules
+  copy:
+    src: lego.rules
+    dest: /etc/iptables.d/lego.rules
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - iptables
+
+- name: Create lego libexec directory
+  file:
+    path: /usr/libexec/lego
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install lego registration script
+  template:
+    src: register.j2
+    dest: /usr/libexec/lego/register
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ lego.sites }}"
+  loop_control:
+    label: "{{ item.site }}"
+
+- name: Install lego renew script
+  template:
+    src: renew.j2
+    dest: /usr/libexec/lego/renew
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ lego.sites }}"
+  loop_control:
+    label: "{{ item.site }}"
+
+- name: Run registration
+  command: /usr/libexec/lego/register
+
+# this allows us to setup without cron installed, maybe a bad idea?
+- name: Ensure cron.d exists
+  file:
+    path: /etc/cron.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install lego renewal crontab
+  copy:
+    src: lego.crontab
+    dest: /etc/cron.d/lego
+    owner: root
+    group: root
+    mode: 0644

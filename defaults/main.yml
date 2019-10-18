@@ -1,0 +1,5 @@
+---
+lego_user: _lego
+lego_group: nginx
+lego_homedir: /var/lib/lego
+lego_webroot: /var/run/lego/webroot
