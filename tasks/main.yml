@@ -59,10 +59,8 @@
     owner: root
     group: root
     mode: 0755
-  with_items:
-    - "{{ lego.sites }}"
-  loop_control:
-    label: "{{ item.site }}"
+
+# TODO: set read permissions on certs
 
 - name: Install lego renew script
   template:
@@ -71,10 +69,6 @@
     owner: root
     group: root
     mode: 0755
-  with_items:
-    - "{{ lego.sites }}"
-  loop_control:
-    label: "{{ item.site }}"
 
 - name: Run registration
   command: /usr/libexec/lego/register

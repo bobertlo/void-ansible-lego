@@ -1,5 +1,5 @@
 #!/bin/sh
 
-{% for name in item.names %}
-[ -e "{{ lego_homedir }}/certificates/{{ name }}.crt" ] || exec chpst -u "{{ lego_user }}:{{ lego_group }}" lego -a --path "{{ lego_homedir }}" -m "{{ lego.hostmaster_email }}" --http.webroot "{{ lego_webroot }}" --http -d "{{ name }}" run
+{% for item in lego.sites %}
+[ -e "{{ lego_homedir }}/certificates/{{ item }}.crt" ] || exec chpst -u "{{ lego_user }}:{{ lego_group }}" lego -a --path "{{ lego_homedir }}" -m "{{ lego.hostmaster_email }}" --http.webroot "{{ lego_webroot }}" --http -d "{{ item }}" run
 {% endfor %}

@@ -15,6 +15,7 @@ Meta
 
 Files Managed:
   * /var/lib/lego/*
+  * /usr/libexec/{register,renew}
   * /etc/cron.d/lego
 
 Defaults Provided:
@@ -24,9 +25,7 @@ Defaults Provided:
 
 Variables Required:
   * lego.hostmaster_email: Email address for alerts
-  * lego.sites: dictionary of site definitions
-    * site: name of site
-    * names: names that are valid URLs for this site
+  * lego.sites: list of site urls
 
 Optional Variables:
   * None
